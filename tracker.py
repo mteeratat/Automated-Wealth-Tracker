@@ -5,6 +5,7 @@ import os
 from dotenv import load_dotenv
 import logging
 import time
+import requests
 
 load_dotenv()
 
@@ -15,12 +16,30 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+def send_telegram_alert(message):
+    token = os.getenv("TELEGRAM_BOT_TOKEN")
+    chat_id = os.getenv("TELEGRAM_CHAT_ID")
+    if not token or not chat_id:
+        logger.warning("Telegram credentials missing. Skipping alert.")
+        return
+    url = f"https://api.telegram.org/bot{token}/sendMessage"
+    payload = {"chat_id": chat_id, "text": message}
+
+    try:
+        response = requests.post(url, json=payload)
+        response.raise_for_status()
+    except Exception as e:
+        logger.error(f"Failed to send Telegram alert: {e}")
+
+
 def track_asset():
     init_db()
 
     watchlist = os.getenv("TICKERS").split(",")
+    summary = ""
 
     for ticker in watchlist:
+        sign = "$"
         isFetchSuccess = False
         isDbSuccess = False
         isCreate = False
@@ -61,13 +80,24 @@ def track_asset():
         if isFetchSuccess:
             if isDbSuccess:
                 if isCreate:
-                    logger.info(f"✅ Saved {ticker}: ${close}")
+                    if ".BK" in ticker:
+                        sign = "฿"
+                    logger.info(f"✅ Saved {ticker}: {sign}{close:.2f}")
+                    summary += f"✅ {ticker}: {sign}{close:.2f}\n"
                 else:
                     logger.info(f"ℹ️ {ticker} already tracked for today. Skipping.")
+                    summary += f"ℹ️ {ticker}: Already tracked\n"
             else:
                 logger.error(f"❌ Database FAILED for {ticker}")
+                summary += f"❌ {ticker}: DB Failed\n"
         else:
             logger.error(f"❌ Fetch FAILED for {ticker}")
+            summary += f"❌ {ticker}: Fetch Failed\n"
+
+    if summary:
+        today = datetime.date.today()
+        full_msg = f"💰 Daily Stocks Price for {today}:\n\n{summary}"
+        send_telegram_alert(full_msg)
 
 
 if __name__ == "__main__":
