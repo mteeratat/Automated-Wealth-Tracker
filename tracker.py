@@ -1,11 +1,12 @@
 from database import init_db, AssetPrice
 import yfinance as yf
-import datetime
+from datetime import datetime
 import os
 from dotenv import load_dotenv
 import logging
 import time
 import requests
+import pytz
 
 load_dotenv()
 
@@ -35,6 +36,8 @@ def send_telegram_alert(message):
 def track_asset():
     init_db()
 
+    bkk_tz = pytz.timezone("Asia/Bangkok")
+    today = datetime.now(bkk_tz).date()
     watchlist = os.getenv("TICKERS").split(",")
     summary = ""
 
@@ -62,7 +65,7 @@ def track_asset():
             for attempt in range(3):
                 try:
                     obj, isCreate = AssetPrice.get_or_create(
-                        date=datetime.date.today(),
+                        date=today,
                         asset_name=ticker,
                         defaults={
                             "price": close,
@@ -95,8 +98,9 @@ def track_asset():
             summary += f"❌ {ticker}: Fetch Failed\n"
 
     if summary:
-        today = datetime.date.today()
-        full_msg = f"💰 Daily Stocks Price for {today}:\n\n{summary}"
+        full_msg = (
+            f"💰 Daily Stocks Price for {today.strftime('%d/%m/%Y')}:\n\n{summary}"
+        )
         send_telegram_alert(full_msg)
 
 
