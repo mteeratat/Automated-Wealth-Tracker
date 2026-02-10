@@ -36,8 +36,8 @@ def send_telegram_alert(message):
 def track_asset():
     init_db()
 
-    bkk_tz = pytz.timezone("Asia/Bangkok")
-    today = datetime.now(bkk_tz).date()
+    # bkk_tz = pytz.timezone("Asia/Bangkok")
+    today = datetime.now().date()
     watchlist = os.getenv("TICKERS").split(",")
     summary = ""
 
