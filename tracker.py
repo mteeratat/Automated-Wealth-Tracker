@@ -6,7 +6,6 @@ from dotenv import load_dotenv
 import logging
 import time
 import requests
-import pytz
 
 load_dotenv()
 
@@ -36,7 +35,6 @@ def send_telegram_alert(message):
 def track_asset():
     init_db()
 
-    # bkk_tz = pytz.timezone("Asia/Bangkok")
     today = datetime.now().date()
     watchlist = os.getenv("TICKERS").split(",")
     summary = ""
