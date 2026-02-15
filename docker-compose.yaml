@@ -1,0 +1,29 @@
+services:
+  db:
+    image: postgres:15-alpine # The "Brain" of the DB. Alpine is a tiny, fast version.
+    restart: no # If it crashes, Docker will wake it back up automatically.
+    environment: # Setting up the DB initial credentials.
+      POSTGRES_DB: ${POSTGRES_DB:-wealth_db} # Use .env value, or default to wealth_db.
+      POSTGRES_USER: ${POSTGRES_USER:-user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+    ports:
+      - "5432:5432" # Connects your laptop's port 5432 to the container's 5432.
+    volumes:
+      - postgres_data:/var/lib/postgresql/data # 👈 CRITICAL: Keeps your data safe on your disk!
+
+  app:
+    build: . # Look for a Dockerfile in the current folder and build it.
+    depends_on:
+      - db # Don't start the app until the database is ready.
+    environment:
+      DB_TYPE: postgres # Tells our Python code: "Use the Postgres logic today!"
+      POSTGRES_DB: ${POSTGRES_DB:-wealth_db}
+      POSTGRES_USER: ${POSTGRES_USER:-user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_HOST: db # 👈 Docker Magic: In a network, "db" refers to the other container.
+      TICKERS: ${TICKERS} # Pass your secret stock list from .env.
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID}
+
+volumes:
+  postgres_data: # Creates a persistent storage space on your hard drive.

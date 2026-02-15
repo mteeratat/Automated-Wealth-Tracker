@@ -1,11 +1,28 @@
-from peewee import SqliteDatabase, Model, DateField, CharField, FloatField
+from peewee import (
+    SqliteDatabase,
+    PostgresqlDatabase,
+    Model,
+    DateField,
+    CharField,
+    FloatField,
+)
 import datetime
 import os
 from dotenv import load_dotenv
 
 load_dotenv()
 
-db = SqliteDatabase(os.getenv("DB_NAME", "wealth.db"))
+# 🧠 Dynamic Database Choice
+if os.getenv("DB_TYPE") == "postgres":
+    db = PostgresqlDatabase(
+        os.getenv("POSTGRES_DB", "wealth_db"),
+        user=os.getenv("POSTGRES_USER", "user"),
+        password=os.getenv("POSTGRES_PASSWORD", "password"),
+        host=os.getenv("POSTGRES_HOST", "localhost"),
+        port=int(os.getenv("POSTGRES_PORT", 5432)),
+    )
+else:
+    db = SqliteDatabase(os.getenv("DB_NAME", "wealth.db"))
 
 
 class AssetPrice(Model):

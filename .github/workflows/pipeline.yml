@@ -37,8 +37,17 @@ jobs:
           pip install -r requirements.txt
       - name: Run Tracker
         env:
-          DB_NAME: ${{ secrets.DB_NAME }}
-          TICKERS: ${{ secrets.TICKERS }}
+          # Configuration Variables (Non-sensitive)
+          DB_TYPE: ${{ vars.DB_TYPE }}
+          DB_NAME: ${{ vars.DB_NAME }}
+          TICKERS: ${{ vars.TICKERS }}
+          POSTGRES_DB: ${{ vars.POSTGRES_DB }}
+          POSTGRES_PORT: ${{ vars.POSTGRES_PORT }}
+          
+          # Secrets (Sensitive)
+          POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python tracker.py
