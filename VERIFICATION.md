@@ -22,7 +22,7 @@ python tracker.py
 ```
 **What to look for:**
 - [ ] Console logs saying `HTTP Request: ... "HTTP/2 201 Created"` (or 200).
-- [ ] A success message: `✅ Saved [TICKER]: [PRICE]`.
+- [ ] A success message showing the ACTUAL market date: `✅ Saved [TICKER] [2026-02-13]: [PRICE]`.
 - [ ] A notification arriving on your **Telegram** phone app.
 
 ### Step C: Run the Dashboard
