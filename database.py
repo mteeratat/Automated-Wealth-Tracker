@@ -9,6 +9,7 @@ from peewee import (
 )
 from supabase import create_client, Client
 import datetime
+from datetime import timezone
 import os
 import logging
 from dotenv import load_dotenv
@@ -50,8 +51,8 @@ class AssetPrice(Model):
     asset_name = CharField()
     price = FloatField()
     currency = CharField(default="USD")
-    # Audit Field: Tracks exactly when the record was last touched
-    updated_at = DateTimeField(default=datetime.datetime.now)
+    # Audit Field: Tracks exactly when the record was last touched (UTC)
+    updated_at = DateTimeField(default=lambda: datetime.datetime.now(timezone.utc))
 
     class Meta:
         database = db
@@ -84,7 +85,7 @@ def save_asset_price(date, asset_name, price, currency):
             "asset_name": asset_name,
             "price": price,
             "currency": currency,
-            "updated_at": datetime.datetime.now().isoformat(),
+            "updated_at": datetime.datetime.now(timezone.utc).isoformat(),
         }
         try:
             res = (
@@ -106,13 +107,13 @@ def save_asset_price(date, asset_name, price, currency):
             defaults={
                 "price": price,
                 "currency": currency,
-                "updated_at": datetime.datetime.now(),
+                "updated_at": datetime.datetime.now(timezone.utc),
             },
         )
         # If the record already existed, we update the price to the latest
         if not created:
             obj.price = price
-            obj.updated_at = datetime.datetime.now()
+            obj.updated_at = datetime.datetime.now(timezone.utc)
             obj.save()
         return True, created
 
