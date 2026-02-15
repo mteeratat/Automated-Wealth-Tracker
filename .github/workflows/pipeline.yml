@@ -38,16 +38,12 @@ jobs:
       - name: Run Tracker
         env:
           # Configuration Variables (Non-sensitive)
-          DB_TYPE: ${{ vars.DB_TYPE }}
           DB_NAME: ${{ vars.DB_NAME }}
           TICKERS: ${{ vars.TICKERS }}
-          POSTGRES_DB: ${{ vars.POSTGRES_DB }}
-          POSTGRES_PORT: ${{ vars.POSTGRES_PORT }}
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
           
           # Secrets (Sensitive)
-          POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
-          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
         run: python tracker.py

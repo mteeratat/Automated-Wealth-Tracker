@@ -1,4 +1,4 @@
-from database import init_db, AssetPrice
+from database import init_db, save_asset_price
 import yfinance as yf
 from datetime import datetime
 import os
@@ -66,15 +66,9 @@ def track_asset():
         if isFetchSuccess:
             for attempt in range(3):
                 try:
-                    obj, isCreate = AssetPrice.get_or_create(
-                        date=today,
-                        asset_name=ticker,
-                        defaults={
-                            "price": close,
-                            "currency": currency,
-                        },
+                    isDbSuccess, isCreate = save_asset_price(
+                        today, ticker, close, currency
                     )
-                    isDbSuccess = True
                     break
                 except Exception as e:
                     logger.error(
