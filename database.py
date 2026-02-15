@@ -5,6 +5,7 @@ from peewee import (
     DateField,
     CharField,
     FloatField,
+    CompositeKey,
 )
 import datetime
 import os
@@ -33,7 +34,7 @@ class AssetPrice(Model):
 
     class Meta:
         database = db
-        indexes = ((("date", "asset_name"), True),)
+        primary_key = CompositeKey("date", "asset_name")
 
 
 def init_db():
