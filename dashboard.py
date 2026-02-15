@@ -1,13 +1,15 @@
-from database import AssetPrice
+import streamlit as st
 import pandas as pd
-import os
 from dotenv import load_dotenv
+from database import AssetPrice
 
 load_dotenv()
+
 
 st.set_page_config(page_title="Automated Wealth Tracker", layout="wide")
 
 st.title("💰 Wealth Tracker Dashboard")
+
 
 # 1. Load Data
 def load_data():
@@ -15,6 +17,7 @@ def load_data():
     query = AssetPrice.select().order_by(AssetPrice.date.desc())
     data = list(query.dicts())
     return pd.DataFrame(data)
+
 
 df = load_data()
 
