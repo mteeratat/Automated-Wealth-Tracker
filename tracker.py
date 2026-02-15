@@ -41,6 +41,10 @@ def track_asset():
 
     for ticker in watchlist:
         sign = "$"
+        currency = "USD"
+        if ".BK" in ticker:
+            sign = "฿"
+            currency = "THB"
         isFetchSuccess = False
         isDbSuccess = False
         isCreate = False
@@ -67,6 +71,7 @@ def track_asset():
                         asset_name=ticker,
                         defaults={
                             "price": close,
+                            "currency": currency,
                         },
                     )
                     isDbSuccess = True
@@ -81,8 +86,6 @@ def track_asset():
         if isFetchSuccess:
             if isDbSuccess:
                 if isCreate:
-                    if ".BK" in ticker:
-                        sign = "฿"
                     logger.info(f"✅ Saved {ticker}: {sign}{close:.2f}")
                     summary += f"✅ {ticker}: {sign}{close:.2f}\n"
                 else:
